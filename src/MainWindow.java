@@ -17,6 +17,7 @@
 //
 
 import java.awt.*;
+import java.awt.event.*;
 import java.net.*;
 import java.util.logging.*;
 import javax.swing.*;
@@ -24,6 +25,9 @@ import javax.swing.event.*;
 import javax.swing.text.*;
 
 public final class MainWindow {
+
+    // note(nschultz): This font gets packaged with the jdk
+    private static final Font defaultFont = new Font("Monospace", Font.PLAIN, 14);
 
     private JFrame frame;
 
@@ -44,6 +48,40 @@ public final class MainWindow {
             } catch (final Exception ex) {
                 Main.logger.log(Level.SEVERE, "Failed to set system look and feel.");
             }
+        }
+
+        fonts: {
+            UIManager.put("Button.font", defaultFont);
+            UIManager.put("ToggleButton.font", defaultFont);
+            UIManager.put("RadioButton.font", defaultFont);
+            UIManager.put("CheckBox.font", defaultFont);
+            UIManager.put("ColorChooser.font", defaultFont);
+            UIManager.put("ComboBox.font", defaultFont);
+            UIManager.put("Label.font", defaultFont);
+            UIManager.put("List.font", defaultFont);
+            UIManager.put("MenuBar.font", defaultFont);
+            UIManager.put("MenuItem.font", defaultFont);
+            UIManager.put("RadioButtonMenuItem.font", defaultFont);
+            UIManager.put("CheckBoxMenuItem.font", defaultFont);
+            UIManager.put("Menu.font", defaultFont);
+            UIManager.put("PopupMenu.font", defaultFont);
+            UIManager.put("OptionPane.font", defaultFont);
+            UIManager.put("Panel.font", defaultFont);
+            UIManager.put("ProgressBar.font", defaultFont);
+            UIManager.put("ScrollPane.font", defaultFont);
+            UIManager.put("Viewport.font", defaultFont);
+            UIManager.put("TabbedPane.font", defaultFont);
+            UIManager.put("Table.font", defaultFont);
+            UIManager.put("TableHeader.font", defaultFont);
+            UIManager.put("TextField.font", defaultFont);
+            UIManager.put("PasswordField.font", defaultFont);
+            UIManager.put("TextArea.font", defaultFont);
+            UIManager.put("TextPane.font", defaultFont);
+            UIManager.put("EditorPane.font", defaultFont);
+            UIManager.put("TitledBorder.font", defaultFont);
+            UIManager.put("ToolBar.font", defaultFont);
+            UIManager.put("ToolTip.font", defaultFont);
+            UIManager.put("Tree.font", defaultFont);
         }
 
         frame: {
@@ -180,7 +218,7 @@ public final class MainWindow {
 
             final JTextPane outputArea = new JTextPane();
             outputArea.setEditable(false);
-            outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+            outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
             final ClientConHandler clientConHandler = new ClientConHandler(new ClientConHandler.Callback() {
                 @Override public void onConnectionEstablished() {
@@ -188,7 +226,7 @@ public final class MainWindow {
                     statusLabel.setText("Status: online");
                     ipv4Field.setEditable(false);
                     portField.setEditable(false);
-                    outputArea.setBorder(BorderFactory.createLineBorder(new Color(20, 200, 20), 2));
+                    outputArea.setBorder(BorderFactory.createLineBorder(new Color(20, 200, 20), 1));
                     appendToPane(outputArea, "**CONNECTION ESTABLISHED**", Color.BLACK, true);
                 }
                 @Override public void onIncomingData(final String data) {
@@ -205,7 +243,7 @@ public final class MainWindow {
                     statusLabel.setText("Status: offline");
                     ipv4Field.setEditable(true);
                     portField.setEditable(true);
-                    outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+                    outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
                     appendToPane(outputArea, "**CONNECTION RELEASED**", Color.BLACK, true);
                 }
             });
@@ -229,6 +267,16 @@ public final class MainWindow {
             clientPanel.add(headerPanel, BorderLayout.NORTH);
 
             final JTextField inputField = new JTextField();
+            inputField.addFocusListener(new FocusListener() {
+                @Override public void focusGained(final FocusEvent evt) {
+                    // todo(nschultz): lerp border
+                    inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+                }
+                @Override public void focusLost(final FocusEvent evt) {
+                    inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                }
+            });
+            inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
             inputField.addActionListener(e -> {
                 if (clientConHandler.isConnected()) {
                     final String input = inputField.getText();
@@ -299,7 +347,7 @@ public final class MainWindow {
 
             final JTextPane outputArea = new JTextPane();
             outputArea.setEditable(false);
-            outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+            outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
             final JButton openButton = new JButton("Open");
 
@@ -309,7 +357,7 @@ public final class MainWindow {
                     statusLabel.setText("Status: online");
                     ipv4Field.setEditable(false);
                     portField.setEditable(false);
-                    outputArea.setBorder(BorderFactory.createLineBorder(new Color(20, 200, 20), 2));
+                    outputArea.setBorder(BorderFactory.createLineBorder(new Color(20, 200, 20), 1));
                     appendToPane(outputArea, "**SERVER OPEN**", Color.BLACK, true);
                 }
                 @Override public void onNewClient(final Socket client) {
@@ -329,7 +377,7 @@ public final class MainWindow {
                     statusLabel.setText("Status: offline");
                     ipv4Field.setEditable(true);
                     portField.setEditable(true);
-                    outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+                    outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
                     appendToPane(outputArea, "**SERVER CLOSED**", Color.BLACK, true);
                 }
             });
@@ -353,6 +401,15 @@ public final class MainWindow {
             serverPanel.add(headerPanel, BorderLayout.NORTH);
 
             final JTextField inputField = new JTextField();
+            inputField.addFocusListener(new FocusListener() {
+                @Override public void focusGained(final FocusEvent evt) {
+                    inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+                }
+                @Override public void focusLost(final FocusEvent evt) {
+                    inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                }
+            });
+            inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
             inputField.addActionListener(e -> {
                 if (serverConHandler.isOpen() && serverConHandler.hasClient()) {
                     final String input = inputField.getText();

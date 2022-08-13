@@ -19,6 +19,7 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
+import java.util.concurrent.atomic.*;
 import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -152,6 +153,7 @@ public final class MainWindow {
 
         final JTabbedPane tabPane = new JTabbedPane();
         final JPanel root = new JPanel(new BorderLayout());
+        root.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         root.add(tabPane, BorderLayout.CENTER);
         final JPanel clientPanel = new JPanel(new BorderLayout(4, 4));
         final JPanel serverPanel = new JPanel(new BorderLayout(4, 4));
@@ -160,6 +162,12 @@ public final class MainWindow {
         tabPane.addTab("Info", new JPanel()); // todo(nschultz): Parse ipconfig output
 
         client_tab: {
+            final JButton connectButton = new JButton("Connect");
+
+            // note(nschultz): 'must be effect final' *sigh*
+            final AtomicBoolean ipv4Valid = new AtomicBoolean(true);
+            final AtomicBoolean portValid = new AtomicBoolean(true);
+
             final JLabel ipv4Label = new JLabel("IPv4: ");
             final JTextField ipv4Field = new JTextField("127.0.0.1");
             ipv4Field.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -167,22 +175,46 @@ public final class MainWindow {
                 @Override public void changedUpdate(final DocumentEvent evt) {
                     if (checkIpv4Input(ipv4Field.getText())) {
                         ipv4Field.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                        ipv4Valid.set(true);;
                     } else {
                         ipv4Field.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                        ipv4Valid.set(false);;
+                    }
+
+                    if (ipv4Valid.get() && portValid.get()) {
+                        connectButton.setEnabled(true);
+                    } else {
+                        connectButton.setEnabled(false);
                     }
                 }
                 @Override public void removeUpdate(final DocumentEvent evt)  {
                     if (checkIpv4Input(ipv4Field.getText())) {
                         ipv4Field.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                        ipv4Valid.set(true);;
                     } else {
                         ipv4Field.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                        ipv4Valid.set(false);;
+                    }
+
+                    if (ipv4Valid.get() && portValid.get()) {
+                        connectButton.setEnabled(true);
+                    } else {
+                        connectButton.setEnabled(false);
                     }
                 }
                 @Override public void insertUpdate(final DocumentEvent evt)  {
                     if (checkIpv4Input(ipv4Field.getText())) {
                         ipv4Field.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                        ipv4Valid.set(true);;
                     } else {
                         ipv4Field.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                        ipv4Valid.set(false);;
+                    }
+
+                    if (ipv4Valid.get() && portValid.get()) {
+                        connectButton.setEnabled(true);
+                    } else {
+                        connectButton.setEnabled(false);
                     }
                 }
             });
@@ -193,28 +225,51 @@ public final class MainWindow {
                 @Override public void changedUpdate(final DocumentEvent evt) {
                     if (checkPortInput(portField.getText())) {
                         portField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                        portValid.set(true);;
                     } else {
                         portField.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                        portValid.set(false);;
+                    }
+
+                    if (ipv4Valid.get() && portValid.get()) {
+                        connectButton.setEnabled(true);
+                    } else {
+                        connectButton.setEnabled(false);
                     }
                 }
                 @Override public void removeUpdate(final DocumentEvent evt)  {
                     if (checkPortInput(portField.getText())) {
                         portField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                        portValid.set(true);;
                     } else {
                         portField.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                        portValid.set(false);;
+                    }
+
+                    if (ipv4Valid.get() && portValid.get()) {
+                        connectButton.setEnabled(true);
+                    } else {
+                        connectButton.setEnabled(false);
                     }
                 }
                 @Override public void insertUpdate(final DocumentEvent evt)  {
                     if (checkPortInput(portField.getText())) {
                         portField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                        portValid.set(true);;
                     } else {
                         portField.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                        portValid.set(false);;
+                    }
+
+                    if (ipv4Valid.get() && portValid.get()) {
+                        connectButton.setEnabled(true);
+                    } else {
+                        connectButton.setEnabled(false);
                     }
                 }
             });
             final JLabel statusLabel = new JLabel("Status: offline");
             statusLabel.setBackground(Color.RED);
-            final JButton connectButton = new JButton("Connect");
 
             final JTextPane outputArea = new JTextPane();
             outputArea.setEditable(false);
@@ -290,32 +345,8 @@ public final class MainWindow {
         }
 
         server_tab: {
-            final JLabel ipv4Label = new JLabel("IPv4: ");
-            final JTextField ipv4Field = new JTextField("127.0.0.1");
-            ipv4Field.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-            ipv4Field.getDocument().addDocumentListener(new DocumentListener() {
-                @Override public void changedUpdate(final DocumentEvent evt) {
-                    if (checkIpv4Input(ipv4Field.getText())) {
-                        ipv4Field.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-                    } else {
-                        ipv4Field.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-                    }
-                }
-                @Override public void removeUpdate(final DocumentEvent evt)  {
-                    if (checkIpv4Input(ipv4Field.getText())) {
-                        ipv4Field.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-                    } else {
-                        ipv4Field.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-                    }
-                }
-                @Override public void insertUpdate(final DocumentEvent evt)  {
-                    if (checkIpv4Input(ipv4Field.getText())) {
-                        ipv4Field.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-                    } else {
-                        ipv4Field.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-                    }
-                }
-            });
+            final JButton openButton = new JButton("Open");
+
             final JLabel portLabel = new JLabel("Port: ");
             final JTextField portField = new JTextField("1234");
             portField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
@@ -323,22 +354,28 @@ public final class MainWindow {
                 @Override public void changedUpdate(final DocumentEvent evt) {
                     if (checkPortInput(portField.getText())) {
                         portField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                        openButton.setEnabled(true);
                     } else {
                         portField.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                        openButton.setEnabled(false);
                     }
                 }
                 @Override public void removeUpdate(final DocumentEvent evt)  {
                     if (checkPortInput(portField.getText())) {
                         portField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                        openButton.setEnabled(true);
                     } else {
                         portField.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                        openButton.setEnabled(false);
                     }
                 }
                 @Override public void insertUpdate(final DocumentEvent evt)  {
                     if (checkPortInput(portField.getText())) {
                         portField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+                        openButton.setEnabled(true);
                     } else {
                         portField.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
+                        openButton.setEnabled(false);
                     }
                 }
             });
@@ -349,13 +386,10 @@ public final class MainWindow {
             outputArea.setEditable(false);
             outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
-            final JButton openButton = new JButton("Open");
-
             final ServerConHandler serverConHandler = new ServerConHandler(new ServerConHandler.Callback() {
                 @Override public void onOpen() {
                     openButton.setText("Close");
                     statusLabel.setText("Status: online");
-                    ipv4Field.setEditable(false);
                     portField.setEditable(false);
                     outputArea.setBorder(BorderFactory.createLineBorder(new Color(20, 200, 20), 1));
                     appendToPane(outputArea, "**SERVER OPEN**", Color.BLACK, true);
@@ -375,7 +409,6 @@ public final class MainWindow {
                 @Override public void onClose() {
                     openButton.setText("Open");
                     statusLabel.setText("Status: offline");
-                    ipv4Field.setEditable(true);
                     portField.setEditable(true);
                     outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
                     appendToPane(outputArea, "**SERVER CLOSED**", Color.BLACK, true);
@@ -391,9 +424,7 @@ public final class MainWindow {
                 serverConHandler.start(Integer.parseInt(portField.getText()));
             });
 
-            final JPanel headerPanel = new JPanel(new GridLayout(3, 3, 4, 4));
-            headerPanel.add(ipv4Label);
-            headerPanel.add(ipv4Field);
+            final JPanel headerPanel = new JPanel(new GridLayout(2, 2, 4, 4));
             headerPanel.add(portLabel);
             headerPanel.add(portField);
             headerPanel.add(statusLabel);

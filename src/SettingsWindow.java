@@ -87,15 +87,9 @@ public final class SettingsWindow {
         @Override
         public Class<?> getColumnClass(final int columnIndex) {
             return switch (columnIndex) {
-                case 0 -> {
-                    yield String.class;
-                }
-                case 1 -> {
-                    yield Boolean.class;
-                }
-                default -> {
-                    yield String.class;
-                }
+                case 0  -> String.class;
+                case 1  -> Boolean.class;
+                default -> String.class;
             };
         }
 

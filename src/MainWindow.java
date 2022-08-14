@@ -361,6 +361,9 @@ public final class MainWindow {
             inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
             inputField.addActionListener(e -> {
                 if (clientConHandler.isConnected()) {
+                    outputArea.setCaretPosition(outputArea.getText().length());
+                    hexOutputArea.setCaretPosition(hexOutputArea.getText().length());
+
                     String input = inputField.getText();
                     if (Settings.wrapInStxEtx) {
                         input = (char) 0x02 + input + (char) 0x03;
@@ -510,6 +513,9 @@ public final class MainWindow {
             inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
             inputField.addActionListener(e -> {
                 if (serverConHandler.isOpen() && serverConHandler.hasClient()) {
+                    outputArea.setCaretPosition(outputArea.getText().length());
+                    hexOutputArea.setCaretPosition(hexOutputArea.getText().length());
+
                     String input = inputField.getText();
                     if (Settings.wrapInStxEtx) {
                         input = (char) 0x02 + input + (char) 0x03;

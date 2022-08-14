@@ -22,6 +22,8 @@ public final class Settings {
     public static volatile boolean insertNewLine      = true;
     public static volatile int     bufSize            = 4096; // note(nschultz) a page I guess
     public static volatile String  conditionalAnswer  = "";
+    public static volatile String  macro              = "PING";
+    public static volatile String  msgOnConEst        = "";
 
     private Settings() {
         assert false;

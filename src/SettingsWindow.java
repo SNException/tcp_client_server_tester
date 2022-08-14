@@ -44,10 +44,12 @@ public final class SettingsWindow {
         final SettingsTableModel model = new SettingsTableModel();
 
         insert_settings: {
-            model.addRow(new Object[]{"Wrap STX-ETX",           String.valueOf(Settings.wrapInStxEtx)});
-            model.addRow(new Object[]{"Insert new line",        String.valueOf(Settings.insertNewLine)});
-            model.addRow(new Object[]{"Reading buffer size",    String.valueOf(Settings.bufSize)});
-            model.addRow(new Object[]{"If message X answer Y",  String.valueOf(Settings.conditionalAnswer)});
+            model.addRow(new Object[]{"Wrap STX-ETX",             String.valueOf(Settings.wrapInStxEtx)});
+            model.addRow(new Object[]{"Insert new line",          String.valueOf(Settings.insertNewLine)});
+            model.addRow(new Object[]{"Reading buffer size",      String.valueOf(Settings.bufSize)});
+            model.addRow(new Object[]{"If message X answer Y",    String.valueOf(Settings.conditionalAnswer)});
+            model.addRow(new Object[]{"Macro F5",                 String.valueOf(Settings.macro)});
+            model.addRow(new Object[]{"Message on establishment", String.valueOf(Settings.msgOnConEst)});
         }
 
         final JTable table = new JTable(model);
@@ -62,6 +64,8 @@ public final class SettingsWindow {
             final boolean newline = Boolean.parseBoolean((String) model.getValueAt(1, 1));
             final int     bufSize = Integer.parseInt((String) model.getValueAt(2, 1));
             final String  cond    = (String) model.getValueAt(3, 1);
+            final String  macro   = (String) model.getValueAt(4, 1);
+            final String  onEst   = (String) model.getValueAt(5, 1);
 
             // note(nschultz): apply settings
             // todo(nschultz): save to file
@@ -69,6 +73,8 @@ public final class SettingsWindow {
             Settings.insertNewLine     = newline;
             Settings.bufSize           = bufSize;
             Settings.conditionalAnswer = cond;
+            Settings.macro             = macro;
+            Settings.msgOnConEst       = onEst;
 
             this.frame.dispose();
         });

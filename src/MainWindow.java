@@ -300,6 +300,22 @@ public final class MainWindow {
 
                     hexOutputArea.setBorder(BorderFactory.createLineBorder(new Color(20, 200, 20), 1));
                     appendToPane(hexOutputArea, "**CONNECTION ESTABLISHED**\n", Color.BLACK, true);
+
+                    if (!Settings.msgOnConEst.isEmpty()) {
+                        final String msgOnConEstMod = Settings.msgOnConEst.replaceAll("\\\\n", "\n");
+
+                        clientConHandler.send(msgOnConEstMod);
+                        appendToPane(outputArea, msgOnConEstMod, Color.BLACK, false);
+
+                        for (final char c : msgOnConEstMod.toCharArray()) {
+                            final String hex = String.format("%02X ", new BigInteger(1, new byte[]{(byte) c}));
+                            appendToPane(hexOutputArea, hex, Color.BLACK, false);
+
+                            if (hex.strip().equals("0A")) { // note(nschultz): new line
+                                appendToPane(hexOutputArea, "\n", Color.BLACK, false);
+                            }
+                        }
+                    }
                 }
                 @Override public void onIncomingData(final String data) {
                     appendToPane(outputArea, data, Color.BLUE, false);
@@ -393,6 +409,10 @@ public final class MainWindow {
                 @Override public void keyPressed(final KeyEvent evt) {
                     if (evt.getKeyCode() == KeyEvent.VK_UP) {
                         inputField.setText(MainWindow.this.lastMessage);
+                    } else if (evt.getKeyCode() == KeyEvent.VK_F5) {
+                        // todo(nschultz): This might be a bit hacky
+                        inputField.setText(Settings.macro);
+                        inputField.getActionListeners()[0].actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
                     }
                 }
             });
@@ -527,6 +547,22 @@ public final class MainWindow {
                 @Override public void onNewClient(final Socket client) {
                     appendToPane(outputArea, String.format("**NEW CLIENT: %s**\n", client.getInetAddress()), Color.BLACK, true);
                     appendToPane(hexOutputArea, String.format("**NEW CLIENT: %s**\n", client.getInetAddress()), Color.BLACK, true);
+
+                    if (!Settings.msgOnConEst.isEmpty()) {
+                        final String msgOnConEstMod = Settings.msgOnConEst.replaceAll("\\\\n", "\n");
+
+                        serverConHandler.send(msgOnConEstMod);
+                        appendToPane(outputArea, msgOnConEstMod, Color.BLACK, false);
+
+                        for (final char c : msgOnConEstMod.toCharArray()) {
+                            final String hex = String.format("%02X ", new BigInteger(1, new byte[]{(byte) c}));
+                            appendToPane(hexOutputArea, hex, Color.BLACK, false);
+
+                            if (hex.strip().equals("0A")) { // note(nschultz): new line
+                                appendToPane(hexOutputArea, "\n", Color.BLACK, false);
+                            }
+                        }
+                    }
                 }
                 @Override public void onClientLost(final Socket client) {
                     appendToPane(outputArea, String.format("**LOST CLIENT: %s**\n", client.getInetAddress()), Color.BLACK, true);
@@ -616,6 +652,10 @@ public final class MainWindow {
                 @Override public void keyPressed(final KeyEvent evt) {
                     if (evt.getKeyCode() == KeyEvent.VK_UP) {
                         inputField.setText(MainWindow.this.lastMessage);
+                    } else if (evt.getKeyCode() == KeyEvent.VK_F5) {
+                        // todo(nschultz): This might be a bit hacky
+                        inputField.setText(Settings.macro);
+                        inputField.getActionListeners()[0].actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
                     }
                 }
             });

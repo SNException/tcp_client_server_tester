@@ -24,7 +24,7 @@ import java.util.logging.*;
 
 public final class ServerConHandler implements Runnable {
 
-    public Callback callback;
+    public Callback callback; // note(nschultz): Gets set after ctor, if not then default callback will be used
 
     private ServerSocket serverSocket = null;
     private Socket theClient          = null;
@@ -55,7 +55,7 @@ public final class ServerConHandler implements Runnable {
             this.serverSocket = new ServerSocket(this.port, maxCons);
             this.callback.onOpen();
 
-            this.theClient = waitForClient();
+            waitForClient();
             if (this.theClient == null) {
                 return;
             }
@@ -76,7 +76,7 @@ public final class ServerConHandler implements Runnable {
                         Main.logger.log(Level.INFO, String.format("Connection has been closed from '%s:%s'", theClient.getInetAddress(), theClient.getPort()));
                         this.callback.onClientLost(this.theClient);
                         closeClient();
-                        this.theClient = waitForClient();
+                        waitForClient();
                         if (this.theClient == null) {
                             // note(nschultz): User has to call 'start()' again
                             return;
@@ -97,27 +97,24 @@ public final class ServerConHandler implements Runnable {
         }
     }
 
-    private Socket waitForClient() {
+    private void waitForClient() {
         assert isOpen();
+        assert !hasClient();
 
-        Socket client = null;
         try {
-            client = this.serverSocket.accept();
+            this.theClient = this.serverSocket.accept();
             // note(nschultz): We do not store the return values because
             // we will call them for each send we are doing. If they then fail at some point
             // we know the connection has been lost.
-            client.getInputStream();
-            client.getOutputStream();
+            this.theClient.getInputStream();
+            this.theClient.getOutputStream();
 
-            this.callback.onNewClient(client);
+            this.callback.onNewClient(this.theClient);
 
         } catch (final IOException ex) {
             Main.logger.log(Level.INFO, String.format("Failed to wait for client on port '%s'", this.port));
             this.callback.onConnectionFailure(ex.getMessage());
-            return null;
         }
-
-        return client;
     }
 
     public void start(final int port) {

@@ -28,7 +28,8 @@ Features and differences:
     9.)  Settings (e.g automatic stx-etx and/or new line insertions)
     10.) Automatic and conditional responding of certain messages (e.g if receive "POLL" then send "ACK")
     11.) Drag and drop file contents
-    12.) No UDP support (never needed it)
+    12.) IP and port validation
+    13.) No UDP support (never needed it)
 
 
 How to build

@@ -24,7 +24,7 @@ Major differences:
     5.) UTF-8 by default
     6.) Build in ascii table
     7.) Coloring of output
-    8.) Setings (e.g autommatic stx-etx and/or new line insertions)
+    8.) Setings (e.g automatic stx-etx and/or new line insertions)
     9.) No UDP support (never needed it)
 
 

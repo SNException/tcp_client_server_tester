@@ -99,10 +99,14 @@ public final class MainWindow {
             this.frame.setLocationRelativeTo(null);
         }
 
+        // todo(nschultz): Refactor this mess (scope handling)
+        final JMenuItem fileMenuClearClientItem = new JMenuItem("Clear client output");
+        final JMenuItem fileMenuClearServerItem = new JMenuItem("Clear server output");
         menu_bar: {
             final JMenuBar menubar = new JMenuBar();
             final JMenu fileMenu = new JMenu("File");
             final JMenu helpMenu = new JMenu("Help");
+
             final JMenuItem fileMenuSettingsItem = new JMenuItem("Settings");
             fileMenuSettingsItem.addActionListener(e -> {
                 new SettingsWindow(this).show();
@@ -154,6 +158,8 @@ public final class MainWindow {
                 dialog.add(panel);
                 dialog.setVisible(true);
             });
+            fileMenu.add(fileMenuClearClientItem);
+            fileMenu.add(fileMenuClearServerItem);
             fileMenu.add(fileMenuSettingsItem);
             fileMenu.add(fileMenuExitItem);
             helpMenu.add(helpMenuAboutItem);
@@ -501,6 +507,12 @@ public final class MainWindow {
             });
             inputPanel.add(controlCharsButton, BorderLayout.EAST);
             clientPanel.add(inputPanel, BorderLayout.SOUTH);
+
+            // todo(nschultz): We have to refactor this mess
+            fileMenuClearClientItem.addActionListener(e -> {
+                outputArea.setText("");
+                hexOutputArea.setText("");
+            });
         }
 
         server_tab: {
@@ -754,6 +766,12 @@ public final class MainWindow {
             });
             inputPanel.add(controlCharsButton, BorderLayout.EAST);
             serverPanel.add(inputPanel, BorderLayout.SOUTH);
+
+            // todo(nschultz): We have to refactor this mess
+            fileMenuClearServerItem.addActionListener(e -> {
+                outputArea.setText("");
+                hexOutputArea.setText("");
+            });
         }
 
         // note(nschultz): finally add all the content to our frame

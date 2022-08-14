@@ -30,7 +30,7 @@ public final class MainWindow {
     // note(nschultz): This font gets packaged with the jdk
     private static final Font defaultFont = new Font("Monospace", Font.PLAIN, 14);
 
-    private JFrame frame;
+    public JFrame frame;
 
     public MainWindow() {
         assert !EventQueue.isDispatchThread();
@@ -97,6 +97,10 @@ public final class MainWindow {
             final JMenuBar menubar = new JMenuBar();
             final JMenu fileMenu = new JMenu("File");
             final JMenu helpMenu = new JMenu("Help");
+            final JMenuItem fileMenuSettingsItem = new JMenuItem("Settings");
+            fileMenuSettingsItem.addActionListener(e -> {
+                new SettingsWindow(this).show();
+            });
             final JMenuItem fileMenuExitItem = new JMenuItem("Exit");
             fileMenuExitItem.addActionListener(e -> {
                 // todo(nschultz): shutdown possible connections? Not really needed since the OS does that anyway but...
@@ -144,6 +148,7 @@ public final class MainWindow {
                 dialog.add(panel);
                 dialog.setVisible(true);
             });
+            fileMenu.add(fileMenuSettingsItem);
             fileMenu.add(fileMenuExitItem);
             helpMenu.add(helpMenuAboutItem);
             menubar.add(fileMenu);
@@ -334,9 +339,17 @@ public final class MainWindow {
             inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
             inputField.addActionListener(e -> {
                 if (clientConHandler.isConnected()) {
-                    final String input = inputField.getText();
+                    String input = inputField.getText();
                     appendToPane(outputArea, input, Color.BLACK, false);
-                    clientConHandler.send(input.getBytes());
+
+                    if (Settings.wrapInStxEtx) {
+                        input = (char) 0x02 + input + (char) 0x03;
+                    }
+                    if (Settings.insertNewLine) {
+                        input = input + (char) 0xA;
+                    }
+
+                    clientConHandler.send(input);
                 }
                 inputField.setText("");
             });
@@ -443,9 +456,16 @@ public final class MainWindow {
             inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
             inputField.addActionListener(e -> {
                 if (serverConHandler.isOpen() && serverConHandler.hasClient()) {
-                    final String input = inputField.getText();
+                    String input = inputField.getText();
                     appendToPane(outputArea, input, Color.BLACK, false);
-                    serverConHandler.send(input.getBytes());
+
+                    if (Settings.wrapInStxEtx) {
+                        input = (char) 0x02 + input + (char) 0x03;
+                    }
+                    if (Settings.insertNewLine) {
+                        input = input + (char) 0xA;
+                    }
+                    serverConHandler.send(input);
                 }
                 inputField.setText("");
             });

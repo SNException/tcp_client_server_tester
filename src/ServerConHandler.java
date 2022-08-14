@@ -50,7 +50,7 @@ public final class ServerConHandler implements Runnable {
         } catch (final IOException ex) {
             Main.logger.log(Level.INFO, String.format("Failed to open server on port '%s'", this.port));
             this.callback.onConnectionFailure(ex.getMessage());
-            return; // note(nschultz): User has to call 'tryOpen()' again
+            return; // note(nschultz): User has to call 'start()' again
         }
 
         read_loop: {
@@ -60,7 +60,7 @@ public final class ServerConHandler implements Runnable {
                     final byte[] buf = new byte[1024]; // todo(nschultz): size
                     final int readBytes = in.read(buf);
                     if (readBytes == -1) {
-                        Main.logger.log(Level.INFO, String.format("Connecton has been closed from '%s:%s'", theClient.getInetAddress(), theClient.getPort()));
+                        Main.logger.log(Level.INFO, String.format("Connection has been closed from '%s:%s'", theClient.getInetAddress(), theClient.getPort()));
                         this.callback.onClientLost(this.theClient);
                         closeClient();
                         this.theClient = waitForClient();
@@ -137,12 +137,12 @@ public final class ServerConHandler implements Runnable {
         }
     }
 
-    public void send(final byte[] data) {
+    public void send(final String data) {
         assert isOpen() && hasClient();
 
         try {
             final OutputStream out = this.theClient.getOutputStream();
-            out.write(data);
+            out.write(data.getBytes()); // todo(nschultz): encoding
             out.flush();
         } catch (final IOException ex) {
             Main.logger.log(Level.INFO, String.format("Failed to write data to '%s:%s'", this.theClient.getInetAddress(), this.theClient.getPort()));

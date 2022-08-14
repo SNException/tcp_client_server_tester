@@ -7,10 +7,20 @@ How to build
 ------------
 
 Windows
-    > build.bat
+    $ build.bat
 
 Other
-    > ./build.sh
+    $ ./build.sh
+
+
+How to test
+------------
+
+You can use the build-in client/server of course or if you are on linux 'nc' is a very neat tool to use.
+To run as a client:
+    $ nc 127.0.0.1 1234
+To run as a server:
+    $ nc -l 1234
 
 
 License

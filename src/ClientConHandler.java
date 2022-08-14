@@ -73,7 +73,7 @@ public final class ClientConHandler implements Runnable {
                     final byte[] buf = new byte[1024]; // todo(nschultz): size
                     final int readBytes = in.read(buf);
                     if (readBytes == -1) {
-                        Main.logger.log(Level.INFO, String.format("Connecton has been closed from '%s:%s'", ipv4, this.port));
+                        Main.logger.log(Level.INFO, String.format("Connection has been closed from '%s:%s'", ipv4, this.port));
                         teardown();
                         return; // note(nschultz): User has to call 'start()' again
                     } else {
@@ -119,12 +119,12 @@ public final class ClientConHandler implements Runnable {
         }
     }
 
-    public void send(final byte[] data) {
+    public void send(final String data) {
         assert isConnected();
 
         try {
             final OutputStream out = this.clientSocket.getOutputStream();
-            out.write(data);
+            out.write(data.getBytes()); // todo(nschultz): encoding
             out.flush();
         } catch (final IOException ex) {
             Main.logger.log(Level.INFO, String.format("Failed to write data to '%s:%s'", this.clientSocket.getInetAddress(), this.clientSocket.getPort()));

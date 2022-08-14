@@ -36,7 +36,7 @@ public final class SettingsWindow {
     }
 
     private void init() {
-        this.frame = new JFrame("TCP Client/Server Tester v0.1.0 - Settings");
+        this.frame = new JFrame("Settings");
         this.frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         // this.frame.setSize(700, 500);
 

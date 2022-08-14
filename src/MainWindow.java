@@ -293,26 +293,30 @@ public final class MainWindow {
                     portField.setEditable(false);
 
                     outputArea.setBorder(BorderFactory.createLineBorder(new Color(20, 200, 20), 1));
-                    appendToPane(outputArea, "**CONNECTION ESTABLISHED**", Color.BLACK, true);
+                    appendToPane(outputArea, "**CONNECTION ESTABLISHED**\n", Color.BLACK, true);
 
                     hexOutputArea.setBorder(BorderFactory.createLineBorder(new Color(20, 200, 20), 1));
-                    appendToPane(hexOutputArea, "**CONNECTION ESTABLISHED**", Color.BLACK, true);
+                    appendToPane(hexOutputArea, "**CONNECTION ESTABLISHED**\n", Color.BLACK, true);
                 }
                 @Override public void onIncomingData(final String data) {
                     appendToPane(outputArea, data, Color.BLUE, false);
 
                     for (final char c : data.toCharArray()) {
                         final String hex = String.format("%02X ", new BigInteger(1, new byte[]{(byte) c}));
-                        appendToPane(hexOutputArea, hex, Color.BLUE, false, false);
+                        appendToPane(hexOutputArea, hex, Color.BLUE, false);
+
+                        if (hex.strip().equals("0A")) { // note(nschultz): new line
+                            appendToPane(hexOutputArea, "\n", Color.BLACK, false);
+                        }
                     }
                 }
                 @Override public void onConnectionFailure(final String reason) {
-                    appendToPane(outputArea, String.format("**ERROR: %s**", reason), Color.BLACK, true);
-                    appendToPane(hexOutputArea, String.format("**ERROR: %s**", reason), Color.BLACK, true);
+                    appendToPane(outputArea, String.format("**ERROR: %s**\n", reason), Color.BLACK, true);
+                    appendToPane(hexOutputArea, String.format("**ERROR: %s**\n", reason), Color.BLACK, true);
                 }
                 @Override public void onConnectionTimeout() {
-                    appendToPane(outputArea, "**CONNECTION ESTABLISHMENT TIMEOUT**", Color.BLACK, true);
-                    appendToPane(hexOutputArea, "**CONNECTION ESTABLISHMENT TIMEOUT**", Color.BLACK, true);
+                    appendToPane(outputArea, "**CONNECTION ESTABLISHMENT TIMEOUT**\n", Color.BLACK, true);
+                    appendToPane(hexOutputArea, "**CONNECTION ESTABLISHMENT TIMEOUT**\n", Color.BLACK, true);
                 }
                 @Override public void onConnectionReleased() {
                     connectButton.setText("Connect");
@@ -320,9 +324,9 @@ public final class MainWindow {
                     ipv4Field.setEditable(true);
                     portField.setEditable(true);
                     outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-                    appendToPane(outputArea, "**CONNECTION RELEASED**", Color.BLACK, true);
+                    appendToPane(outputArea, "**CONNECTION RELEASED**\n", Color.BLACK, true);
                     hexOutputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-                    appendToPane(hexOutputArea, "**CONNECTION RELEASED**", Color.BLACK, true);
+                    appendToPane(hexOutputArea, "**CONNECTION RELEASED**\n", Color.BLACK, true);
                 }
             });
 
@@ -358,18 +362,21 @@ public final class MainWindow {
             inputField.addActionListener(e -> {
                 if (clientConHandler.isConnected()) {
                     String input = inputField.getText();
-                    appendToPane(outputArea, input, Color.BLACK, false);
-
-                    for (final char c : input.toCharArray()) {
-                        final String hex = String.format("%02X ", new BigInteger(1, new byte[]{(byte) c}));
-                        appendToPane(hexOutputArea, hex, Color.BLACK, false, false);
-                    }
-
                     if (Settings.wrapInStxEtx) {
                         input = (char) 0x02 + input + (char) 0x03;
                     }
                     if (Settings.insertNewLine) {
                         input = input + (char) 0xA;
+                    }
+
+                    appendToPane(outputArea, input, Color.BLACK, false);
+
+                    for (final char c : input.toCharArray()) {
+                        final String hex = String.format("%02X ", new BigInteger(1, new byte[]{(byte) c}));
+                        appendToPane(hexOutputArea, hex, Color.BLACK, false);
+                        if (hex.strip().equals("0A")) { // note(nschultz): new line
+                            appendToPane(hexOutputArea, "\n", Color.BLACK, false);
+                        }
                     }
 
                     clientConHandler.send(input);
@@ -437,38 +444,41 @@ public final class MainWindow {
                     statusLabel.setText("Status: online");
                     portField.setEditable(false);
                     outputArea.setBorder(BorderFactory.createLineBorder(new Color(20, 200, 20), 1));
-                    appendToPane(outputArea, "**SERVER OPEN**", Color.BLACK, true);
+                    appendToPane(outputArea, "**SERVER OPEN**\n", Color.BLACK, true);
                     hexOutputArea.setBorder(BorderFactory.createLineBorder(new Color(20, 200, 20), 1));
-                    appendToPane(hexOutputArea, "**SERVER OPEN**", Color.BLACK, true);
+                    appendToPane(hexOutputArea, "**SERVER OPEN**\n", Color.BLACK, true);
                 }
                 @Override public void onNewClient(final Socket client) {
-                    appendToPane(outputArea, String.format("**NEW CLIENT: %s**", client.getInetAddress()), Color.BLACK, true);
-                    appendToPane(hexOutputArea, String.format("**NEW CLIENT: %s**", client.getInetAddress()), Color.BLACK, true);
+                    appendToPane(outputArea, String.format("**NEW CLIENT: %s**\n", client.getInetAddress()), Color.BLACK, true);
+                    appendToPane(hexOutputArea, String.format("**NEW CLIENT: %s**\n", client.getInetAddress()), Color.BLACK, true);
                 }
                 @Override public void onClientLost(final Socket client) {
-                    appendToPane(outputArea, String.format("**LOST CLIENT: %s**", client.getInetAddress()), Color.BLACK, true);
-                    appendToPane(hexOutputArea, String.format("**LOST CLIENT: %s**", client.getInetAddress()), Color.BLACK, true);
+                    appendToPane(outputArea, String.format("**LOST CLIENT: %s**\n", client.getInetAddress()), Color.BLACK, true);
+                    appendToPane(hexOutputArea, String.format("**LOST CLIENT: %s**\n", client.getInetAddress()), Color.BLACK, true);
                 }
                 @Override public void onIncomingData(final String data) {
                     appendToPane(outputArea, data, Color.BLUE, false);
 
                     for (final char c : data.toCharArray()) {
                         final String hex = String.format("%02X ", new BigInteger(1, new byte[]{(byte) c}));
-                        appendToPane(hexOutputArea, hex, Color.BLUE, false, false);
+                        appendToPane(hexOutputArea, hex, Color.BLUE, false);
+                        if (hex.strip().equals("0A")) { // note(nschultz): new line
+                            appendToPane(hexOutputArea, "\n", Color.BLACK, false);
+                        }
                     }
                 }
                 @Override public void onConnectionFailure(final String reason) {
-                    appendToPane(outputArea, String.format("**ERROR: %s**", reason), Color.BLACK, true);
-                    appendToPane(hexOutputArea, String.format("**ERROR: %s**", reason), Color.BLACK, true);
+                    appendToPane(outputArea, String.format("**ERROR: %s**\n", reason), Color.BLACK, true);
+                    appendToPane(hexOutputArea, String.format("**ERROR: %s**\n", reason), Color.BLACK, true);
                 }
                 @Override public void onClose() {
                     openButton.setText("Open");
                     statusLabel.setText("Status: offline");
                     portField.setEditable(true);
                     outputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-                    appendToPane(outputArea, "**SERVER CLOSED**", Color.BLACK, true);
+                    appendToPane(outputArea, "**SERVER CLOSED**\n", Color.BLACK, true);
                     hexOutputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-                    appendToPane(hexOutputArea, "**SERVER CLOSED**", Color.BLACK, true);
+                    appendToPane(hexOutputArea, "**SERVER CLOSED**\n", Color.BLACK, true);
                 }
             });
 
@@ -501,18 +511,21 @@ public final class MainWindow {
             inputField.addActionListener(e -> {
                 if (serverConHandler.isOpen() && serverConHandler.hasClient()) {
                     String input = inputField.getText();
-                    appendToPane(outputArea, input, Color.BLACK, false);
-
-                    for (final char c : input.toCharArray()) {
-                        final String hex = String.format("%02X ", new BigInteger(1, new byte[]{(byte) c}));
-                        appendToPane(hexOutputArea, hex, Color.BLACK, false, false);
-                    }
-
                     if (Settings.wrapInStxEtx) {
                         input = (char) 0x02 + input + (char) 0x03;
                     }
                     if (Settings.insertNewLine) {
                         input = input + (char) 0xA;
+                    }
+
+                    appendToPane(outputArea, input, Color.BLACK, false);
+
+                    for (final char c : input.toCharArray()) {
+                        final String hex = String.format("%02X ", new BigInteger(1, new byte[]{(byte) c}));
+                        appendToPane(hexOutputArea, hex, Color.BLACK, false);
+                        if (hex.strip().equals("0A")) { // note(nschultz): new line
+                            appendToPane(hexOutputArea, "\n", Color.BLACK, false);
+                        }
                     }
                     serverConHandler.send(input);
                 }
@@ -578,10 +591,6 @@ public final class MainWindow {
     }
 
     private static void appendToPane(final JTextPane pane, final String string, final Color color, final boolean bold) {
-        appendToPane(pane, string, color, bold, true);
-    }
-
-    private static void appendToPane(final JTextPane pane, final String string, final Color color, final boolean bold, final boolean lf) {
         assert string != null;
         assert pane   != null;
         assert color  != null;
@@ -593,11 +602,7 @@ public final class MainWindow {
                 StyleConstants.setBold(attr, bold);
 
                 final StyledDocument doc = pane.getStyledDocument();
-                if (lf) {
-                    doc.insertString(doc.getLength(), string + "\n", attr);
-                } else {
-                    doc.insertString(doc.getLength(), string, attr);
-                }
+                doc.insertString(doc.getLength(), string, attr);
             } catch (final Exception ex) {
                 Main.logger.log(Level.SEVERE, ex.toString());
             }
@@ -609,15 +614,12 @@ public final class MainWindow {
                     StyleConstants.setBold(attr, bold);
 
                     final StyledDocument doc = pane.getStyledDocument();
-                    if (lf) {
-                        doc.insertString(doc.getLength(), string + "\n", attr);
-                    } else {
-                        doc.insertString(doc.getLength(), string, attr);
-                    }
+                    doc.insertString(doc.getLength(), string, attr);
                 } catch (final Exception ex) {
                     Main.logger.log(Level.SEVERE, ex.toString());
                 }
             });
         }
+
     }
 }

@@ -19,7 +19,7 @@
 public final class Settings {
 
     public static volatile boolean wrapInStxEtx  = false;
-    public static volatile boolean insertNewLine = false;
+    public static volatile boolean insertNewLine = true;
 
     private Settings() {
         assert false;

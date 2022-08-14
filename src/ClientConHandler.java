@@ -19,6 +19,7 @@
 import java.awt.*;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.*;
 import java.util.logging.*;
 
 public final class ClientConHandler implements Runnable {
@@ -77,7 +78,7 @@ public final class ClientConHandler implements Runnable {
                         teardown();
                         return; // note(nschultz): User has to call 'start()' again
                     } else {
-                        this.callback.onIncomingData(new String(buf, 0, readBytes)); // todo(nschultz): encoding
+                        this.callback.onIncomingData(new String(buf, 0, readBytes, StandardCharsets.UTF_8)); // todo(nschultz): encoding
                         continue;
                     }
                 } catch (final IOException ex) {
@@ -124,7 +125,7 @@ public final class ClientConHandler implements Runnable {
 
         try {
             final OutputStream out = this.clientSocket.getOutputStream();
-            out.write(data.getBytes()); // todo(nschultz): encoding
+            out.write(data.getBytes(StandardCharsets.UTF_8)); // todo(nschultz): encoding
             out.flush();
         } catch (final IOException ex) {
             Main.logger.log(Level.INFO, String.format("Failed to write data to '%s:%s'", this.clientSocket.getInetAddress(), this.clientSocket.getPort()));

@@ -34,6 +34,8 @@ public final class MainWindow {
 
     public JFrame frame;
 
+    private String lastMessage = "";
+
     public MainWindow() {
         assert !EventQueue.isDispatchThread();
 
@@ -363,6 +365,13 @@ public final class MainWindow {
                 }
             });
             inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+            inputField.addKeyListener(new KeyAdapter() {
+                @Override public void keyPressed(final KeyEvent evt) {
+                    if (evt.getKeyCode() == KeyEvent.VK_UP) {
+                        inputField.setText(MainWindow.this.lastMessage);
+                    }
+                }
+            });
             inputField.addActionListener(e -> {
                 if (clientConHandler.isConnected()) {
                     outputArea.setCaretPosition(outputArea.getText().length());
@@ -386,6 +395,7 @@ public final class MainWindow {
                         }
                     }
 
+                    this.lastMessage = input;
                     clientConHandler.send(input);
                 }
                 inputField.setText("");
@@ -552,6 +562,13 @@ public final class MainWindow {
                 }
             });
             inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+            inputField.addKeyListener(new KeyAdapter() {
+                @Override public void keyPressed(final KeyEvent evt) {
+                    if (evt.getKeyCode() == KeyEvent.VK_UP) {
+                        inputField.setText(MainWindow.this.lastMessage);
+                    }
+                }
+            });
             inputField.addActionListener(e -> {
                 if (serverConHandler.isOpen() && serverConHandler.hasClient()) {
                     outputArea.setCaretPosition(outputArea.getText().length());
@@ -574,6 +591,7 @@ public final class MainWindow {
                             appendToPane(hexOutputArea, "\n", Color.BLACK, false);
                         }
                     }
+                    this.lastMessage = input;
                     serverConHandler.send(input);
                 }
                 inputField.setText("");

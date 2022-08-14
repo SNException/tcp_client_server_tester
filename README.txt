@@ -17,15 +17,16 @@ It has proven very useful to me but there were always some minor tweaks I would 
 So I decided to build my own version of it.
 
 Major differences:
-    1.) No third party libraries
-    2.) OpenJDK-17
-    3.) MIT license
-    4.) Hex view
-    5.) UTF-8 by default
-    6.) Build in ascii table
-    7.) Coloring of output
-    8.) Setings (e.g automatic stx-etx and/or new line insertions)
-    9.) No UDP support (never needed it)
+    1.)  No third party libraries
+    2.)  OpenJDK-17
+    3.)  MIT license
+    4.)  Hex view
+    5.)  UTF-8 by default
+    6.)  Build in ascii table
+    7.)  Coloring of output
+    8.)  History of last command
+    9.)  Setings (e.g automatic stx-etx and/or new line insertions)
+    10.) No UDP support (never needed it)
 
 
 How to build

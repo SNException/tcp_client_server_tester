@@ -21,10 +21,11 @@ Major differences:
     2.) OpenJDK-17
     3.) MIT license
     4.) Hex view
-    5.) Build in ascii table
-    6.) Coloring of output
-    7.) Setings (e.g autommatic stx-etx and/or new line insertions)
-    8.) No UDP support (never needed it)
+    5.) UTF-8 by default
+    6.) Build in ascii table
+    7.) Coloring of output
+    8.) Setings (e.g autommatic stx-etx and/or new line insertions)
+    9.) No UDP support (never needed it)
 
 
 How to build

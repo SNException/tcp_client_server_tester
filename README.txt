@@ -16,7 +16,7 @@ Currently at my work I quiet often use this tool for testing purposes:
 It has proven very useful to me but there were always some minor tweaks I would have liked.
 So I decided to build my own version of it.
 
-Major differences:
+Features and differences:
     1.)  No third party libraries
     2.)  OpenJDK-17
     3.)  MIT license
@@ -25,9 +25,10 @@ Major differences:
     6.)  Build in ascii table
     7.)  Coloring of output
     8.)  History of last command
-    9.)  Setings (e.g automatic stx-etx and/or new line insertions)
-    10.) Automatic conditional responding of certain messages (e.g if POLL then ACK)
-    11.) No UDP support (never needed it)
+    9.)  Settings (e.g automatic stx-etx and/or new line insertions)
+    10.) Automatic and conditional responding of certain messages (e.g if receive "POLL" then send "ACK")
+    11.) Drag and drop file contents
+    12.) No UDP support (never needed it)
 
 
 How to build

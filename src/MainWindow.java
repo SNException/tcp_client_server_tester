@@ -96,8 +96,7 @@ public final class MainWindow {
             this.frame = new JFrame("TCP Client/Server Tester v0.1.0");
             this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             this.frame.setSize(800, 600);
-            this.frame.setLocation(350, 450); // todo(nschultz): temporary
-            // this.frame.setLocationRelativeTo(null);
+            this.frame.setLocationRelativeTo(null);
         }
 
         menu_bar: {

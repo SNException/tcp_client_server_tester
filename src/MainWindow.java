@@ -17,7 +17,10 @@
 //
 
 import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.dnd.*;
 import java.awt.event.*;
+import java.io.*;
 import java.math.*;
 import java.net.*;
 import java.util.concurrent.atomic.*;
@@ -395,6 +398,19 @@ public final class MainWindow {
             clientPanel.add(headerPanel, BorderLayout.NORTH);
 
             final JTextField inputField = new JTextField();
+            inputField.setDropTarget(new DropTarget() {
+                @Override public synchronized void drop(final DropTargetDropEvent evt) {
+                    try {
+                        evt.acceptDrop(DnDConstants.ACTION_COPY);
+                        @SuppressWarnings("unchecked")
+                        final java.util.List<File> droppedFiles = (java.util.List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                        final File firstFile = droppedFiles.get(0);
+                        inputField.setText(new String(java.nio.file.Files.readAllBytes(firstFile.toPath()), java.nio.charset.StandardCharsets.UTF_8));
+                    } catch (Exception ex) {
+                        Main.logger.log(Level.SEVERE, "Failed to drag and drop file");
+                    }
+                }
+            });
             inputField.addFocusListener(new FocusListener() {
                 @Override public void focusGained(final FocusEvent evt) {
                     // todo(nschultz): lerp border
@@ -411,6 +427,7 @@ public final class MainWindow {
                         inputField.setText(MainWindow.this.lastMessage);
                     } else if (evt.getKeyCode() == KeyEvent.VK_F5) {
                         // todo(nschultz): This might be a bit hacky
+                        // todo(nschultz): replace \n with actual new line character!
                         inputField.setText(Settings.macro);
                         inputField.getActionListeners()[0].actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
                     }
@@ -639,6 +656,19 @@ public final class MainWindow {
             serverPanel.add(headerPanel, BorderLayout.NORTH);
 
             final JTextField inputField = new JTextField();
+            inputField.setDropTarget(new DropTarget() {
+                @Override public synchronized void drop(final DropTargetDropEvent evt) {
+                    try {
+                        evt.acceptDrop(DnDConstants.ACTION_COPY);
+                        @SuppressWarnings("unchecked")
+                        final java.util.List<File> droppedFiles = (java.util.List<File>) evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+                        final File firstFile = droppedFiles.get(0);
+                        inputField.setText(new String(java.nio.file.Files.readAllBytes(firstFile.toPath()), java.nio.charset.StandardCharsets.UTF_8));
+                    } catch (Exception ex) {
+                        Main.logger.log(Level.SEVERE, "Failed to drag and drop file");
+                    }
+                }
+            });
             inputField.addFocusListener(new FocusListener() {
                 @Override public void focusGained(final FocusEvent evt) {
                     inputField.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));

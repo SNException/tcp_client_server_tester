@@ -16,7 +16,7 @@ Currently at my work I quiet often use this tool for testing purposes:
 It has proven very useful to me but there were always some minor tweaks I would have liked.
 So I decided to build my own version of it.
 
-Features and differences:
+Features and main differences:
     1.)  No third party libraries
     2.)  OpenJDK-17
     3.)  MIT license

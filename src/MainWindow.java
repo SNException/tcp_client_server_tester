@@ -168,7 +168,6 @@ public final class MainWindow {
         final JPanel serverPanel = new JPanel(new BorderLayout(4, 4));
         tabPane.addTab("Client", clientPanel);
         tabPane.addTab("Server", serverPanel);
-        tabPane.addTab("Info", new JPanel()); // todo(nschultz): Parse ipconfig output
 
         client_tab: {
             final JButton connectButton = new JButton("Connect");

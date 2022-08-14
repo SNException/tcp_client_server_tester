@@ -30,6 +30,8 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
 
+// todo(nschultz): HelpMenuItems -> common ports, what's my IP, subnet
+// todo(nschultz): ASCII Button -> should also show utf-8 chars
 public final class MainWindow {
 
     // note(nschultz): This font gets packaged with the jdk

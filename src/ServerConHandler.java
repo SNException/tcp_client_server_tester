@@ -24,11 +24,23 @@ import java.util.logging.*;
 
 public final class ServerConHandler implements Runnable {
 
-    private final Callback callback;
+    public Callback callback;
 
     private ServerSocket serverSocket = null;
     private Socket theClient          = null;
     private int port;
+
+    public ServerConHandler()  {
+        // note(nschultz): To avoid potential NPE
+        this(new Callback() {
+            public void onOpen() {}
+            public void onNewClient(final Socket client) {}
+            public void onClientLost(final Socket client) {}
+            public void onIncomingData(final String data) {}
+            public void onConnectionFailure(final String reason) {}
+            public void onClose() {}
+        });
+    }
 
     public ServerConHandler(final Callback callback)  {
         assert callback != null;

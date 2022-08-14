@@ -18,9 +18,10 @@
 
 public final class Settings {
 
-    public static volatile boolean wrapInStxEtx  = false;
-    public static volatile boolean insertNewLine = true;
-    public static volatile int     bufSize       = 4096; // note(nschultz) a page I guess
+    public static volatile boolean wrapInStxEtx       = false;
+    public static volatile boolean insertNewLine      = true;
+    public static volatile int     bufSize            = 4096; // note(nschultz) a page I guess
+    public static volatile String  conditionalAnswer  = "";
 
     private Settings() {
         assert false;

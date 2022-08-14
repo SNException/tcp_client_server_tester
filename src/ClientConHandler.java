@@ -24,11 +24,22 @@ import java.util.logging.*;
 
 public final class ClientConHandler implements Runnable {
 
-    private final Callback callback;
+    public Callback callback; // note(nschultz): Gets set after ctor, if not then default callback will be used
 
     private Socket clientSocket = null;
     private String ipv4;
     private int port;
+
+    public ClientConHandler()  {
+        // note(nschultz): To avoid potential NPE
+        this(new Callback() {
+            @Override public void onConnectionEstablished() {}
+            @Override public void onIncomingData(final String data) {}
+            @Override public void onConnectionFailure(final String reason) {}
+            @Override public void onConnectionTimeout() {}
+            @Override public void onConnectionReleased() {}
+        });
+    }
 
     public ClientConHandler(final Callback callback)  {
         assert callback != null;

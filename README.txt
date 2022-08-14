@@ -26,7 +26,8 @@ Major differences:
     7.)  Coloring of output
     8.)  History of last command
     9.)  Setings (e.g automatic stx-etx and/or new line insertions)
-    10.) No UDP support (never needed it)
+    10.) Automatic conditional responding of certain messages (e.g if POLL then ACK)
+    11.) No UDP support (never needed it)
 
 
 How to build

@@ -44,9 +44,10 @@ public final class SettingsWindow {
         final SettingsTableModel model = new SettingsTableModel();
 
         insert_settings: {
-            model.addRow(new Object[]{"Wrap STX-ETX",        String.valueOf(Settings.wrapInStxEtx)});
-            model.addRow(new Object[]{"Insert new line",     String.valueOf(Settings.insertNewLine)});
-            model.addRow(new Object[]{"Reading buffer size", String.valueOf(Settings.bufSize)});
+            model.addRow(new Object[]{"Wrap STX-ETX",           String.valueOf(Settings.wrapInStxEtx)});
+            model.addRow(new Object[]{"Insert new line",        String.valueOf(Settings.insertNewLine)});
+            model.addRow(new Object[]{"Reading buffer size",    String.valueOf(Settings.bufSize)});
+            model.addRow(new Object[]{"If message X answer Y",  String.valueOf(Settings.conditionalAnswer)});
         }
 
         final JTable table = new JTable(model);
@@ -56,14 +57,18 @@ public final class SettingsWindow {
 
         final JButton saveButton = new JButton("Save");
         saveButton.addActionListener(e -> {
-            // note(nschultz): Already validated
+            // note(nschultz): Already validated by 'setValueAt' override of SettingsTableModel
             final boolean stxetx  = Boolean.parseBoolean((String) model.getValueAt(0, 1));
             final boolean newline = Boolean.parseBoolean((String) model.getValueAt(1, 1));
             final int     bufSize = Integer.parseInt((String) model.getValueAt(2, 1));
+            final String  cond    = (String) model.getValueAt(3, 1);
 
-            Settings.wrapInStxEtx  = stxetx;
-            Settings.insertNewLine = newline;
-            Settings.bufSize       = bufSize;
+            // note(nschultz): apply settings
+            // todo(nschultz): save to file
+            Settings.wrapInStxEtx      = stxetx;
+            Settings.insertNewLine     = newline;
+            Settings.bufSize           = bufSize;
+            Settings.conditionalAnswer = cond;
 
             this.frame.dispose();
         });
@@ -110,33 +115,50 @@ public final class SettingsWindow {
         @Override
         public void setValueAt(final Object value, final int row, final int column) {
             super.setValueAt(value, row, column);
-
             // note(nschultz): validation
-            final String stxetx = ((String) super.getValueAt(0, 1)).strip();
-            if (stxetx.equalsIgnoreCase("true") || stxetx.equalsIgnoreCase("false")) {
-                // note(nschultz): we good
-            } else {
-                super.setValueAt("false", 0, 1);
-            }
 
-            final String newline = ((String) super.getValueAt(1, 1)).strip();
-            if (newline.equalsIgnoreCase("true") || newline.equalsIgnoreCase("false")) {
-                // note(nschultz): we good
-            } else {
-                super.setValueAt("false", 1, 1);
-            }
-
-            final String bufSize = ((String) super.getValueAt(2, 1)).strip();
-            try {
-                final int bufSizeInt = Integer.parseInt(bufSize);
-                if (bufSizeInt <= 0) {
-                    super.setValueAt("1", 2, 1);
-                } else {
+            stxetx: {
+                final String stxetx = ((String) super.getValueAt(0, 1)).strip();
+                if (stxetx.equalsIgnoreCase("true") || stxetx.equalsIgnoreCase("false")) {
                     // note(nschultz): we good
+                } else {
+                    super.setValueAt("false", 0, 1);
                 }
-            } catch (final NumberFormatException ex) {
-                // note(nschultz): Not a number
-                super.setValueAt("4096", 2, 1);
+            }
+
+            newline: {
+                final String newline = ((String) super.getValueAt(1, 1)).strip();
+                if (newline.equalsIgnoreCase("true") || newline.equalsIgnoreCase("false")) {
+                    // note(nschultz): we good
+                } else {
+                    super.setValueAt("false", 1, 1);
+                }
+            }
+
+            bufsize: {
+                final String bufSize = ((String) super.getValueAt(2, 1)).strip();
+                try {
+                    final int bufSizeInt = Integer.parseInt(bufSize);
+                    if (bufSizeInt <= 0) {
+                        super.setValueAt("1", 2, 1);
+                    } else {
+                        // note(nschultz): we good
+                    }
+                } catch (final NumberFormatException ex) {
+                    // note(nschultz): Not a number
+                    super.setValueAt("4096", 2, 1);
+                }
+            }
+
+            cond: {
+                // note(nschultz): example-> 'YOUALIVE?\n@YES\n'
+                final String cond = ((String) super.getValueAt(3, 1));
+                final String[] expr = cond.split("@");
+                if (expr == null || expr.length != 2) {
+                    super.setValueAt("", 3, 1);
+                } else {
+                    // note(nschultz): we are good
+                }
             }
         }
     }

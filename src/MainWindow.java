@@ -288,7 +288,8 @@ public final class MainWindow {
             hexOutputArea.setEditable(false);
             hexOutputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
-            final ClientConHandler clientConHandler = new ClientConHandler(new ClientConHandler.Callback() {
+            final ClientConHandler clientConHandler = new ClientConHandler();
+            clientConHandler.callback = new ClientConHandler.Callback() {
                 @Override public void onConnectionEstablished() {
                     connectButton.setText("Disconnect");
                     statusLabel.setText("Status: online");
@@ -313,6 +314,30 @@ public final class MainWindow {
                         }
                     }
 
+                    // note(nschultz): Format has already been validated
+                    if (!Settings.conditionalAnswer.isEmpty()) {
+                        String ifMessage   = Settings.conditionalAnswer.split("@")[0];
+                        String thenMessage = Settings.conditionalAnswer.split("@")[1];
+
+                        ifMessage   = ifMessage.replaceAll("\\\\n", "\n");
+                        thenMessage = thenMessage.replaceAll("\\\\n", "\n");
+
+                        if (data.equals(ifMessage)) {
+                            clientConHandler.send(thenMessage);
+
+                            appendToPane(outputArea, thenMessage, Color.BLACK, false);
+
+                            for (final char c : thenMessage.toCharArray()) {
+                                final String hex = String.format("%02X ", new BigInteger(1, new byte[]{(byte) c}));
+                                appendToPane(hexOutputArea, hex, Color.BLACK, false);
+
+                                if (hex.strip().equals("0A")) { // note(nschultz): new line
+                                    appendToPane(hexOutputArea, "\n", Color.BLACK, false);
+                                }
+                            }
+                        }
+                    }
+
                     outputArea.setCaretPosition(outputArea.getText().length());
                     hexOutputArea.setCaretPosition(hexOutputArea.getText().length());
                 }
@@ -334,7 +359,7 @@ public final class MainWindow {
                     hexOutputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
                     appendToPane(hexOutputArea, "**CONNECTION RELEASED**\n", Color.BLACK, true);
                 }
-            });
+            };
 
             connectButton.addActionListener(e -> {
                 if (clientConHandler.isConnected()) {
@@ -489,7 +514,8 @@ public final class MainWindow {
             hexOutputArea.setEditable(false);
             hexOutputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
-            final ServerConHandler serverConHandler = new ServerConHandler(new ServerConHandler.Callback() {
+            final ServerConHandler serverConHandler = new ServerConHandler();
+            serverConHandler.callback = new ServerConHandler.Callback() {
                 @Override public void onOpen() {
                     openButton.setText("Close");
                     statusLabel.setText("Status: online");
@@ -518,6 +544,31 @@ public final class MainWindow {
                         }
                     }
 
+                    // note(nschultz): Format has already been validated
+                    // todo(nschultz): Perhaps we should make two separate settings for client and server
+                    if (!Settings.conditionalAnswer.isEmpty()) {
+                        String ifMessage   = Settings.conditionalAnswer.split("@")[0];
+                        String thenMessage = Settings.conditionalAnswer.split("@")[1];
+
+                        ifMessage   = ifMessage.replaceAll("\\\\n", "\n");
+                        thenMessage = thenMessage.replaceAll("\\\\n", "\n");
+
+                        if (data.equals(ifMessage)) {
+                            serverConHandler.send(thenMessage);
+
+                            appendToPane(outputArea, thenMessage, Color.BLACK, false);
+
+                            for (final char c : thenMessage.toCharArray()) {
+                                final String hex = String.format("%02X ", new BigInteger(1, new byte[]{(byte) c}));
+                                appendToPane(hexOutputArea, hex, Color.BLACK, false);
+
+                                if (hex.strip().equals("0A")) { // note(nschultz): new line
+                                    appendToPane(hexOutputArea, "\n", Color.BLACK, false);
+                                }
+                            }
+                        }
+                    }
+
                     outputArea.setCaretPosition(outputArea.getText().length());
                     hexOutputArea.setCaretPosition(hexOutputArea.getText().length());
                 }
@@ -534,7 +585,7 @@ public final class MainWindow {
                     hexOutputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
                     appendToPane(hexOutputArea, "**SERVER CLOSED**\n", Color.BLACK, true);
                 }
-            });
+            };
 
             openButton.addActionListener(e -> {
                 if (serverConHandler.isOpen()) {

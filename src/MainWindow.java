@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.*;
 import java.util.logging.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import javax.swing.table.*;
 import javax.swing.text.*;
 
 public final class MainWindow {
@@ -395,7 +396,40 @@ public final class MainWindow {
             viewTab.addTab("Hex", new JScrollPane(hexOutputArea));
 
             clientPanel.add(viewTab, BorderLayout.CENTER);
-            clientPanel.add(inputField, BorderLayout.SOUTH);
+
+            final JPanel inputPanel = new JPanel(new BorderLayout(8, 8));
+            inputPanel.add(inputField, BorderLayout.CENTER);
+            final JButton controlCharsButton = new JButton("ASCII");
+            controlCharsButton.addActionListener(e -> {
+                final JDialog dialog = new JDialog();
+                dialog.setTitle("ASCII Table");
+                final JPanel panel = new JPanel(new BorderLayout());
+                final DefaultTableModel model = new DefaultTableModel(new String[] {"Chr", "Dec", "Hex"}, 0) {
+                    @Override public boolean isCellEditable(final int row, final int col) {
+                        return false;
+                    }
+                };
+                for (int i = 0; i < 127; ++i) {
+                    model.addRow(new String[] {String.valueOf((char) i), String.valueOf(i), String.format("%02X", i)});
+                }
+                final JTable table = new JTable(model);
+                table.addMouseListener(new MouseAdapter() {
+                    @Override public void mousePressed(final MouseEvent evt) {
+                        if (evt.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                            final String value = (String) table.getValueAt(table.getSelectedRow(), 0);
+                            // todo(nschultz): insert at cursor position
+                            inputField.setText(inputField.getText() + value);
+                        }
+                    }
+                });
+                panel.add(new JScrollPane(table), BorderLayout.CENTER);
+                dialog.add(panel);
+                dialog.pack();
+                dialog.setLocationRelativeTo(this.frame);
+                dialog.setVisible(true);
+            });
+            inputPanel.add(controlCharsButton, BorderLayout.EAST);
+            clientPanel.add(inputPanel, BorderLayout.SOUTH);
         }
 
         server_tab: {
@@ -549,7 +583,39 @@ public final class MainWindow {
             viewTab.addTab("Hex", new JScrollPane(hexOutputArea));
 
             serverPanel.add(viewTab, BorderLayout.CENTER);
-            serverPanel.add(inputField, BorderLayout.SOUTH);
+            final JPanel inputPanel = new JPanel(new BorderLayout(8, 8));
+            inputPanel.add(inputField, BorderLayout.CENTER);
+            final JButton controlCharsButton = new JButton("ASCII");
+            controlCharsButton.addActionListener(e -> {
+                final JDialog dialog = new JDialog();
+                dialog.setTitle("ASCII Table");
+                final JPanel panel = new JPanel(new BorderLayout());
+                final DefaultTableModel model = new DefaultTableModel(new String[] {"Chr", "Dec", "Hex"}, 0) {
+                    @Override public boolean isCellEditable(final int row, final int col) {
+                        return false;
+                    }
+                };
+                for (int i = 0; i < 127; ++i) {
+                    model.addRow(new String[] {String.valueOf((char) i), String.valueOf(i), String.format("%02X", i)});
+                }
+                final JTable table = new JTable(model);
+                table.addMouseListener(new MouseAdapter() {
+                    @Override public void mousePressed(final MouseEvent evt) {
+                        if (evt.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                            final String value = (String) table.getValueAt(table.getSelectedRow(), 0);
+                            // todo(nschultz): insert at cursor position
+                            inputField.setText(inputField.getText() + value);
+                        }
+                    }
+                });
+                panel.add(new JScrollPane(table), BorderLayout.CENTER);
+                dialog.add(panel);
+                dialog.pack();
+                dialog.setLocationRelativeTo(this.frame);
+                dialog.setVisible(true);
+            });
+            inputPanel.add(controlCharsButton, BorderLayout.EAST);
+            serverPanel.add(inputPanel, BorderLayout.SOUTH);
         }
 
         // note(nschultz): finally add all the content to our frame

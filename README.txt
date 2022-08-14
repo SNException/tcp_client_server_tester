@@ -1,7 +1,31 @@
-client_server_tester
---------------------
+tcp_client_server_tester
+------------------------
 
-Simple tool to test client-server tcp communication.
+##########################
+!!!STILL IN DEVELOPMENT!!!
+##########################
+
+
+
+
+Simple tool to test client-server tcp communications.
+
+Currently at my work I quiet often use this tool for testing purposes:
+    https://github.com/akshath/SocketTest
+
+It has proven very useful to me but there were always some minor tweaks I would have liked.
+So I decided to build my own version of it.
+
+Major differences:
+    1.) No third party libraries
+    2.) OpenJDK-17
+    3.) MIT license
+    4.) Hex view
+    5.) Build in ascii table
+    6.) Coloring of output
+    7.) Setings (e.g autommatic stx-etx and/or new line insertions)
+    8.) No UDP support (never needed it)
+
 
 How to build
 ------------
@@ -16,17 +40,18 @@ Other
 How to test
 ------------
 
-You can use the build-in client/server of course or if you are on linux 'nc' is a very neat tool to use.
-To run as a client:
+You can use the nc (netcat) on linux like this:
+
+Client:
     $ nc 127.0.0.1 1234
-To run as a server:
+Server:
     $ nc -l 1234
 
 
 License
 -------
 
-Copyright (c) 2021 Niklas Schultz
+Copyright (c) 2022 Niklas Schultz
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction,

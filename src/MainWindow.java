@@ -399,6 +399,7 @@ public final class MainWindow {
 
             final JPanel inputPanel = new JPanel(new BorderLayout(8, 8));
             inputPanel.add(inputField, BorderLayout.CENTER);
+            // todo(nschultz): copy paster (make custom button)
             final JButton controlCharsButton = new JButton("ASCII");
             controlCharsButton.addActionListener(e -> {
                 final JDialog dialog = new JDialog();

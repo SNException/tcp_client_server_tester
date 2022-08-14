@@ -309,6 +309,9 @@ public final class MainWindow {
                             appendToPane(hexOutputArea, "\n", Color.BLACK, false);
                         }
                     }
+
+                    outputArea.setCaretPosition(outputArea.getText().length());
+                    hexOutputArea.setCaretPosition(hexOutputArea.getText().length());
                 }
                 @Override public void onConnectionFailure(final String reason) {
                     appendToPane(outputArea, String.format("**ERROR: %s**\n", reason), Color.BLACK, true);
@@ -469,6 +472,9 @@ public final class MainWindow {
                             appendToPane(hexOutputArea, "\n", Color.BLACK, false);
                         }
                     }
+
+                    outputArea.setCaretPosition(outputArea.getText().length());
+                    hexOutputArea.setCaretPosition(hexOutputArea.getText().length());
                 }
                 @Override public void onConnectionFailure(final String reason) {
                     appendToPane(outputArea, String.format("**ERROR: %s**\n", reason), Color.BLACK, true);

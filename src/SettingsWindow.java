@@ -44,8 +44,9 @@ public final class SettingsWindow {
         final SettingsTableModel model = new SettingsTableModel();
 
         insert_settings: {
-            model.addRow(new Object[]{"Wrap STX-ETX",    String.valueOf(Settings.wrapInStxEtx)});
-            model.addRow(new Object[]{"Insert new line", String.valueOf(Settings.insertNewLine)});
+            model.addRow(new Object[]{"Wrap STX-ETX",        String.valueOf(Settings.wrapInStxEtx)});
+            model.addRow(new Object[]{"Insert new line",     String.valueOf(Settings.insertNewLine)});
+            model.addRow(new Object[]{"Reading buffer size", String.valueOf(Settings.bufSize)});
         }
 
         final JTable table = new JTable(model);
@@ -58,9 +59,11 @@ public final class SettingsWindow {
             // note(nschultz): Already validated
             final boolean stxetx  = Boolean.parseBoolean((String) model.getValueAt(0, 1));
             final boolean newline = Boolean.parseBoolean((String) model.getValueAt(1, 1));
+            final int     bufSize = Integer.parseInt((String) model.getValueAt(2, 1));
 
             Settings.wrapInStxEtx  = stxetx;
             Settings.insertNewLine = newline;
+            Settings.bufSize       = bufSize;
 
             this.frame.dispose();
         });
@@ -121,6 +124,19 @@ public final class SettingsWindow {
                 // note(nschultz): we good
             } else {
                 super.setValueAt("false", 1, 1);
+            }
+
+            final String bufSize = ((String) super.getValueAt(2, 1)).strip();
+            try {
+                final int bufSizeInt = Integer.parseInt(bufSize);
+                if (bufSizeInt <= 0) {
+                    super.setValueAt("1", 2, 1);
+                } else {
+                    // note(nschultz): we good
+                }
+            } catch (final NumberFormatException ex) {
+                // note(nschultz): Not a number
+                super.setValueAt("4096", 2, 1);
             }
         }
     }

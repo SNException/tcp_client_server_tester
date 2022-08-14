@@ -71,7 +71,7 @@ public final class ClientConHandler implements Runnable {
             for (;;) {
                 try {
                     final InputStream in = this.clientSocket.getInputStream();
-                    final byte[] buf = new byte[1024]; // todo(nschultz): size
+                    final byte[] buf = new byte[Settings.bufSize];
                     final int readBytes = in.read(buf);
                     if (readBytes == -1) {
                         Main.logger.log(Level.INFO, String.format("Connection has been closed from '%s:%s'", ipv4, this.port));

@@ -58,7 +58,7 @@ public final class ServerConHandler implements Runnable {
             while (isOpen() && hasClient()) {
                 try {
                     final InputStream in = this.theClient.getInputStream();
-                    final byte[] buf = new byte[1024]; // todo(nschultz): size
+                    final byte[] buf = new byte[Settings.bufSize];
                     final int readBytes = in.read(buf);
                     if (readBytes == -1) {
                         Main.logger.log(Level.INFO, String.format("Connection has been closed from '%s:%s'", theClient.getInetAddress(), theClient.getPort()));

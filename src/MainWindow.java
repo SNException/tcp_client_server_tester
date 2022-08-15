@@ -30,8 +30,12 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.text.*;
 
-// todo(nschultz): HelpMenuItems -> common ports, what's my IP, subnet
-// todo(nschultz): ASCII Button -> should also show utf-8 chars
+// todo(nschultz): Watch file for changes and then send its content (setting), and/or watch entire directory for incoming files
+// todo(nschultz): Ping button next to ipv4 field (isReachable())
+// todo(nschultz): Check port button next to port field:
+//                 On Windows : netstat -nao | find /I ":1234" -> If this returns non empty string, port is not free
+//                 On Unix    : netstat -nao | grep -i ":1234" -> If this returns non empty string, port is not free
+
 public final class MainWindow {
 
     // note(nschultz): This font gets packaged with the jdk
@@ -54,7 +58,7 @@ public final class MainWindow {
 
         skin: {
             try {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             } catch (final Exception ex) {
                 Main.logger.log(Level.SEVERE, "Failed to set system look and feel.");
             }
@@ -121,6 +125,34 @@ public final class MainWindow {
                 Runtime.getRuntime().runFinalization();
                 System.exit(0);
             });
+            final JMenuItem helpMenuCommonPortsItem = new JMenuItem("Common ports");
+            helpMenuCommonPortsItem.addActionListener(e -> {
+                final JDialog dialog = new JDialog();
+                dialog.setTitle("Common ports");
+                final JPanel panel = new JPanel(new BorderLayout());
+                final DefaultTableModel model = new DefaultTableModel(new String[] {"Name", "Value"}, 0) {
+                    @Override public boolean isCellEditable(final int row, final int col) {
+                        return false;
+                    }
+                };
+                model.addRow(new Object[]{"Echo", "7"});
+                model.addRow(new Object[]{"Discard", "9"});
+                model.addRow(new Object[]{"FTP (data port)", "20"});
+                model.addRow(new Object[]{"FTP (control port)", "21"});
+                model.addRow(new Object[]{"SSH", "22"});
+                model.addRow(new Object[]{"Telnet", "23"});
+                model.addRow(new Object[]{"SMTP (E-Mail)", "25"});
+                model.addRow(new Object[]{"HTTP", "80"});
+                model.addRow(new Object[]{"WS", "80"});
+                model.addRow(new Object[]{"HTTPS", "443"});
+                final JTable table = new JTable(model);
+                table.getTableHeader().setReorderingAllowed(false);
+                panel.add(new JScrollPane(table), BorderLayout.CENTER);
+                dialog.add(panel);
+                dialog.pack();
+                dialog.setLocationRelativeTo(this.frame);
+                dialog.setVisible(true);
+            });
             final JMenuItem helpMenuAboutItem = new JMenuItem("About");
             helpMenuAboutItem.addActionListener(e -> {
                 final JDialog dialog = new JDialog();
@@ -163,7 +195,9 @@ public final class MainWindow {
             fileMenu.add(fileMenuClearClientItem);
             fileMenu.add(fileMenuClearServerItem);
             fileMenu.add(fileMenuSettingsItem);
+            fileMenu.addSeparator();
             fileMenu.add(fileMenuExitItem);
+            helpMenu.add(helpMenuCommonPortsItem);
             helpMenu.add(helpMenuAboutItem);
             menubar.add(fileMenu);
             menubar.add(helpMenu);
@@ -362,9 +396,6 @@ public final class MainWindow {
                             }
                         }
                     }
-
-                    outputArea.setCaretPosition(outputArea.getText().length());
-                    hexOutputArea.setCaretPosition(hexOutputArea.getText().length());
                 }
                 @Override public void onConnectionFailure(final String reason) {
                     appendToPane(outputArea, String.format("**ERROR: %s**\n", reason), Color.BLACK, true);
@@ -442,10 +473,8 @@ public final class MainWindow {
             });
             inputField.addActionListener(e -> {
                 if (clientConHandler.isConnected()) {
-                    outputArea.setCaretPosition(outputArea.getText().length());
-                    hexOutputArea.setCaretPosition(hexOutputArea.getText().length());
-
                     String input = inputField.getText();
+                    this.lastMessage = input;
                     if (Settings.wrapInStxEtx) {
                         input = (char) 0x02 + input + (char) 0x03;
                     }
@@ -463,7 +492,6 @@ public final class MainWindow {
                         }
                     }
 
-                    this.lastMessage = input;
                     clientConHandler.send(input);
                 }
                 inputField.setText("");
@@ -488,16 +516,57 @@ public final class MainWindow {
                         return false;
                     }
                 };
-                for (int i = 0; i < 127; ++i) {
-                    model.addRow(new String[] {String.valueOf((char) i), String.valueOf(i), String.format("%02X", i)});
+                for (int i = 0; i < 128; ++i) {
+                    switch (i) {
+                        case 0   -> model.addRow(new String[] {"<NUL>", String.valueOf(i), String.format("%02X", i)});
+                        case 1   -> model.addRow(new String[] {"<SOH>", String.valueOf(i), String.format("%02X", i)});
+                        case 2   -> model.addRow(new String[] {"<STX>", String.valueOf(i), String.format("%02X", i)});
+                        case 3   -> model.addRow(new String[] {"<ETX>", String.valueOf(i), String.format("%02X", i)});
+                        case 4   -> model.addRow(new String[] {"<EOT>", String.valueOf(i), String.format("%02X", i)});
+                        case 5   -> model.addRow(new String[] {"<ENQ>", String.valueOf(i), String.format("%02X", i)});
+                        case 6   -> model.addRow(new String[] {"<ACK>", String.valueOf(i), String.format("%02X", i)});
+                        case 7   -> model.addRow(new String[] {"<BEL>", String.valueOf(i), String.format("%02X", i)});
+                        case 8   -> model.addRow(new String[] {"<BS>",  String.valueOf(i), String.format("%02X", i)});
+                        case 9   -> model.addRow(new String[] {"<TAB>", String.valueOf(i), String.format("%02X", i)});
+                        case 10  -> model.addRow(new String[] {"<LF>",  String.valueOf(i), String.format("%02X", i)});
+                        case 11  -> model.addRow(new String[] {"<VT>",  String.valueOf(i), String.format("%02X", i)});
+                        case 12  -> model.addRow(new String[] {"<FF>",  String.valueOf(i), String.format("%02X", i)});
+                        case 13  -> model.addRow(new String[] {"<CR>",  String.valueOf(i), String.format("%02X", i)});
+                        case 14  -> model.addRow(new String[] {"<SO>",  String.valueOf(i), String.format("%02X", i)});
+                        case 15  -> model.addRow(new String[] {"<SI>",  String.valueOf(i), String.format("%02X", i)});
+                        case 16  -> model.addRow(new String[] {"<DLE>", String.valueOf(i), String.format("%02X", i)});
+                        case 17  -> model.addRow(new String[] {"<DC1>", String.valueOf(i), String.format("%02X", i)});
+                        case 18  -> model.addRow(new String[] {"<DC2>", String.valueOf(i), String.format("%02X", i)});
+                        case 19  -> model.addRow(new String[] {"<DC3>", String.valueOf(i), String.format("%02X", i)});
+                        case 20  -> model.addRow(new String[] {"<DC4>", String.valueOf(i), String.format("%02X", i)});
+                        case 21  -> model.addRow(new String[] {"<NAK>", String.valueOf(i), String.format("%02X", i)});
+                        case 22  -> model.addRow(new String[] {"<SYN>", String.valueOf(i), String.format("%02X", i)});
+                        case 23  -> model.addRow(new String[] {"<ETB>", String.valueOf(i), String.format("%02X", i)});
+                        case 24  -> model.addRow(new String[] {"<CAN>", String.valueOf(i), String.format("%02X", i)});
+                        case 25  -> model.addRow(new String[] {"<EM>",  String.valueOf(i), String.format("%02X", i)});
+                        case 26  -> model.addRow(new String[] {"<SUB>", String.valueOf(i), String.format("%02X", i)});
+                        case 27  -> model.addRow(new String[] {"<Esc>", String.valueOf(i), String.format("%02X", i)});
+                        case 28  -> model.addRow(new String[] {"<FS>",  String.valueOf(i), String.format("%02X", i)});
+                        case 29  -> model.addRow(new String[] {"<GS>",  String.valueOf(i), String.format("%02X", i)});
+                        case 30  -> model.addRow(new String[] {"<RS>",  String.valueOf(i), String.format("%02X", i)});
+                        case 31  -> model.addRow(new String[] {"<US>",  String.valueOf(i), String.format("%02X", i)});
+                        case 32  -> model.addRow(new String[] {"<SP>",  String.valueOf(i), String.format("%02X", i)});
+                        case 127 -> model.addRow(new String[] {"<DEL>",  String.valueOf(i), String.format("%02X", i)});
+                        default  -> model.addRow(new String[] {String.valueOf((char) i), String.valueOf(i), String.format("%02X", i)});
+                    }
                 }
                 final JTable table = new JTable(model);
+                table.getTableHeader().setReorderingAllowed(false);
                 table.addMouseListener(new MouseAdapter() {
                     @Override public void mousePressed(final MouseEvent evt) {
                         if (evt.getClickCount() == 2 && table.getSelectedRow() != -1) {
-                            final String value = (String) table.getValueAt(table.getSelectedRow(), 0);
-                            // todo(nschultz): insert at cursor position
-                            inputField.setText(inputField.getText() + value);
+                            final int decVal = Integer.parseInt(((String) table.getValueAt(table.getSelectedRow(), 1)));
+                            final char c = (char) decVal;
+                            try {
+                                inputField.getDocument().insertString(inputField.getCaretPosition(), String.valueOf(c), null);
+                            } catch (final Exception ex) {
+                                assert false;
+                            }
                         }
                     }
                 });
@@ -633,9 +702,6 @@ public final class MainWindow {
                             }
                         }
                     }
-
-                    outputArea.setCaretPosition(outputArea.getText().length());
-                    hexOutputArea.setCaretPosition(hexOutputArea.getText().length());
                 }
                 @Override public void onConnectionFailure(final String reason) {
                     appendToPane(outputArea, String.format("**ERROR: %s**\n", reason), Color.BLACK, true);
@@ -704,10 +770,8 @@ public final class MainWindow {
             });
             inputField.addActionListener(e -> {
                 if (serverConHandler.isOpen() && serverConHandler.hasClient()) {
-                    outputArea.setCaretPosition(outputArea.getText().length());
-                    hexOutputArea.setCaretPosition(hexOutputArea.getText().length());
-
                     String input = inputField.getText();
+                    this.lastMessage = input;
                     if (Settings.wrapInStxEtx) {
                         input = (char) 0x02 + input + (char) 0x03;
                     }
@@ -724,7 +788,6 @@ public final class MainWindow {
                             appendToPane(hexOutputArea, "\n", Color.BLACK, false);
                         }
                     }
-                    this.lastMessage = input;
                     serverConHandler.send(input);
                 }
                 inputField.setText("");
@@ -748,15 +811,56 @@ public final class MainWindow {
                     }
                 };
                 for (int i = 0; i < 127; ++i) {
-                    model.addRow(new String[] {String.valueOf((char) i), String.valueOf(i), String.format("%02X", i)});
+                    switch (i) {
+                        case 0   -> model.addRow(new String[] {"<NUL>", String.valueOf(i), String.format("%02X", i)});
+                        case 1   -> model.addRow(new String[] {"<SOH>", String.valueOf(i), String.format("%02X", i)});
+                        case 2   -> model.addRow(new String[] {"<STX>", String.valueOf(i), String.format("%02X", i)});
+                        case 3   -> model.addRow(new String[] {"<ETX>", String.valueOf(i), String.format("%02X", i)});
+                        case 4   -> model.addRow(new String[] {"<EOT>", String.valueOf(i), String.format("%02X", i)});
+                        case 5   -> model.addRow(new String[] {"<ENQ>", String.valueOf(i), String.format("%02X", i)});
+                        case 6   -> model.addRow(new String[] {"<ACK>", String.valueOf(i), String.format("%02X", i)});
+                        case 7   -> model.addRow(new String[] {"<BEL>", String.valueOf(i), String.format("%02X", i)});
+                        case 8   -> model.addRow(new String[] {"<BS>",  String.valueOf(i), String.format("%02X", i)});
+                        case 9   -> model.addRow(new String[] {"<TAB>", String.valueOf(i), String.format("%02X", i)});
+                        case 10  -> model.addRow(new String[] {"<LF>",  String.valueOf(i), String.format("%02X", i)});
+                        case 11  -> model.addRow(new String[] {"<VT>",  String.valueOf(i), String.format("%02X", i)});
+                        case 12  -> model.addRow(new String[] {"<FF>",  String.valueOf(i), String.format("%02X", i)});
+                        case 13  -> model.addRow(new String[] {"<CR>",  String.valueOf(i), String.format("%02X", i)});
+                        case 14  -> model.addRow(new String[] {"<SO>",  String.valueOf(i), String.format("%02X", i)});
+                        case 15  -> model.addRow(new String[] {"<SI>",  String.valueOf(i), String.format("%02X", i)});
+                        case 16  -> model.addRow(new String[] {"<DLE>", String.valueOf(i), String.format("%02X", i)});
+                        case 17  -> model.addRow(new String[] {"<DC1>", String.valueOf(i), String.format("%02X", i)});
+                        case 18  -> model.addRow(new String[] {"<DC2>", String.valueOf(i), String.format("%02X", i)});
+                        case 19  -> model.addRow(new String[] {"<DC3>", String.valueOf(i), String.format("%02X", i)});
+                        case 20  -> model.addRow(new String[] {"<DC4>", String.valueOf(i), String.format("%02X", i)});
+                        case 21  -> model.addRow(new String[] {"<NAK>", String.valueOf(i), String.format("%02X", i)});
+                        case 22  -> model.addRow(new String[] {"<SYN>", String.valueOf(i), String.format("%02X", i)});
+                        case 23  -> model.addRow(new String[] {"<ETB>", String.valueOf(i), String.format("%02X", i)});
+                        case 24  -> model.addRow(new String[] {"<CAN>", String.valueOf(i), String.format("%02X", i)});
+                        case 25  -> model.addRow(new String[] {"<EM>",  String.valueOf(i), String.format("%02X", i)});
+                        case 26  -> model.addRow(new String[] {"<SUB>", String.valueOf(i), String.format("%02X", i)});
+                        case 27  -> model.addRow(new String[] {"<Esc>", String.valueOf(i), String.format("%02X", i)});
+                        case 28  -> model.addRow(new String[] {"<FS>",  String.valueOf(i), String.format("%02X", i)});
+                        case 29  -> model.addRow(new String[] {"<GS>",  String.valueOf(i), String.format("%02X", i)});
+                        case 30  -> model.addRow(new String[] {"<RS>",  String.valueOf(i), String.format("%02X", i)});
+                        case 31  -> model.addRow(new String[] {"<US>",  String.valueOf(i), String.format("%02X", i)});
+                        case 32  -> model.addRow(new String[] {"<SP>",  String.valueOf(i), String.format("%02X", i)});
+                        case 127 -> model.addRow(new String[] {"<DEL>",  String.valueOf(i), String.format("%02X", i)});
+                        default  -> model.addRow(new String[] {String.valueOf((char) i), String.valueOf(i), String.format("%02X", i)});
+                    }
                 }
                 final JTable table = new JTable(model);
+                table.getTableHeader().setReorderingAllowed(false);
                 table.addMouseListener(new MouseAdapter() {
                     @Override public void mousePressed(final MouseEvent evt) {
                         if (evt.getClickCount() == 2 && table.getSelectedRow() != -1) {
-                            final String value = (String) table.getValueAt(table.getSelectedRow(), 0);
-                            // todo(nschultz): insert at cursor position
-                            inputField.setText(inputField.getText() + value);
+                            final int decVal = Integer.parseInt(((String) table.getValueAt(table.getSelectedRow(), 1)));
+                            final char c = (char) decVal;
+                            try {
+                                inputField.getDocument().insertString(inputField.getCaretPosition(), String.valueOf(c), null);
+                            } catch (final Exception ex) {
+                                assert false;
+                            }
                         }
                     }
                 });

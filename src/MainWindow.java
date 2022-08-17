@@ -35,10 +35,14 @@ import javax.swing.text.*;
 // todo(nschultz): Check port button next to port field:
 //                 On Windows : netstat -nao | find /I ":1234" -> If this returns non empty string, port is not free
 //                 On Unix    : netstat -nao | grep -i ":1234" -> If this returns non empty string, port is not free
-
+// todo(nschultz): Option to save communication/output to file
+// todo(nschultz): Options to display time and date next to the messages
+// todo(nschultz): Get your current ip
+// todo(nschultz): Get your mac addresse
 public final class MainWindow {
 
     // note(nschultz): This font gets packaged with the jdk
+    // todo(nschultz): Event thread??????
     private static final Font defaultFont = new Font("Monospace", Font.PLAIN, 14);
 
     public JFrame frame;
@@ -98,6 +102,32 @@ public final class MainWindow {
             UIManager.put("Tree.font", defaultFont);
         }
 
+        final ServerConHandler serverConHandler = new ServerConHandler();
+        final ClientConHandler clientConHandler = new ClientConHandler();
+
+        final Lambdas.Nullary<Void> cleanup = () -> {
+            // note(nschultz): We don't really need to do this cleanup, since the OS
+            // will cleanup after the process terminates, I just want to be sure...
+            if (serverConHandler.isOpen()) {
+                serverConHandler.teardown();
+            }
+
+            if (clientConHandler.isConnected()) {
+                clientConHandler.teardown();
+            }
+
+            Runtime.getRuntime().gc();
+            Runtime.getRuntime().runFinalization();
+
+            return (Void) null; // note(nschultz): unreachable
+        };
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override public void run() {
+                cleanup.call();
+            }
+        });
+
         frame: {
             this.frame = new JFrame("TCP Client/Server Tester v0.1.0");
             this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -119,10 +149,7 @@ public final class MainWindow {
             });
             final JMenuItem fileMenuExitItem = new JMenuItem("Exit");
             fileMenuExitItem.addActionListener(e -> {
-                // todo(nschultz): shutdown possible connections? Not really needed since the OS does that anyway but...
-
-                Runtime.getRuntime().gc();
-                Runtime.getRuntime().runFinalization();
+                cleanup.call();
                 System.exit(0);
             });
             final JMenuItem helpMenuCommonPortsItem = new JMenuItem("Common ports");
@@ -331,7 +358,6 @@ public final class MainWindow {
             hexOutputArea.setEditable(false);
             hexOutputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
-            final ClientConHandler clientConHandler = new ClientConHandler();
             clientConHandler.callback = new ClientConHandler.Callback() {
                 @Override public void onConnectionEstablished() {
                     connectButton.setText("Disconnect");
@@ -632,7 +658,6 @@ public final class MainWindow {
             hexOutputArea.setEditable(false);
             hexOutputArea.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
-            final ServerConHandler serverConHandler = new ServerConHandler();
             serverConHandler.callback = new ServerConHandler.Callback() {
                 @Override public void onOpen() {
                     openButton.setText("Close");
@@ -810,7 +835,7 @@ public final class MainWindow {
                         return false;
                     }
                 };
-                for (int i = 0; i < 127; ++i) {
+                for (int i = 0; i < 128; ++i) {
                     switch (i) {
                         case 0   -> model.addRow(new String[] {"<NUL>", String.valueOf(i), String.format("%02X", i)});
                         case 1   -> model.addRow(new String[] {"<SOH>", String.valueOf(i), String.format("%02X", i)});

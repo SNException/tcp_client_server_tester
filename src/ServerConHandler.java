@@ -129,7 +129,7 @@ public final class ServerConHandler implements Runnable {
     }
 
     public boolean isOpen() {
-        // todo(nschultz): Check if port is in use
+        // todo(nschultz): Check if port is in use, ideally by this very process
         return this.serverSocket != null;
     }
 
